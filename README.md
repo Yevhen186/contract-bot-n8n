@@ -18,6 +18,8 @@ Telegram-бот для автоматичної генерації логіст�
 3. Groq (LLM) парсить текст і витягує потрібні поля в JSON
 4. Бот копіює шаблон у Google Drive, замінює всі плейсхолдери через Docs API
 5. Експортує як .docx і надсилає в чат
+<img width="1741" height="1010" alt="image" src="https://github.com/user-attachments/assets/c59a2349-02b1-428e-b757-e649bceed989" />
+
 
 ## Стек
 
