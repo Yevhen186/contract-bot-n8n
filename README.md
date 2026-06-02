@@ -10,6 +10,9 @@ Telegram-бот для автоматичної генерації логіст�
 
 Без бота: вручну заповнювати Word-шаблон ~15 хвилин + ризик помилок.
 З ботом: вставив текст → отримав файл.
+<img width="1748" height="992" alt="image" src="https://github.com/user-attachments/assets/77ebb615-05b8-4be1-afa1-381adef64f52" />
+<img width="1742" height="1018" alt="image" src="https://github.com/user-attachments/assets/bb5a55af-809c-4182-b419-105e06d1f8cc" />
+<img width="1741" height="1023" alt="image" src="https://github.com/user-attachments/assets/98730a29-ddd3-4742-a19a-64c325a83b97" />
 
 ## Як працює
 
@@ -18,9 +21,7 @@ Telegram-бот для автоматичної генерації логіст�
 3. Groq (LLM) парсить текст і витягує потрібні поля в JSON
 4. Бот копіює шаблон у Google Drive, замінює всі плейсхолдери через Docs API
 5. Експортує як .docx і надсилає в чат
-<img width="1748" height="992" alt="image" src="https://github.com/user-attachments/assets/77ebb615-05b8-4be1-afa1-381adef64f52" />
-<img width="1742" height="1018" alt="image" src="https://github.com/user-attachments/assets/bb5a55af-809c-4182-b419-105e06d1f8cc" />
-<img width="1741" height="1023" alt="image" src="https://github.com/user-attachments/assets/98730a29-ddd3-4742-a19a-64c325a83b97" />
+
 
 
 
