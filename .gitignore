@@ -1,0 +1,34 @@
+# =============================================================================
+# CONTRACT BOT — .gitignore
+# =============================================================================
+
+# Environment variables — NEVER commit real credentials
+.env
+.env.local
+.env.production
+
+# n8n local data (if running locally)
+.n8n/
+n8n-data/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.temp
+
+# Node (if any local tooling)
+node_modules/

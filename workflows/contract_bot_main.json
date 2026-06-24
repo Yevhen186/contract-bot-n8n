@@ -1,0 +1,3457 @@
+{
+  "name": "Contract Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -880,
+        -496
+      ],
+      "id": "9ef2ebb5-8a12-4b52-9328-2e2bf5886827",
+      "name": "Telegram Trigger",
+      "webhookId": "73d2d9b9-ac59-4b23-9fea-a3d63165fb63",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4c268008-bd2d-4957-9999-756458b1d116",
+              "leftValue": "={{ $json.callback_query?.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -432,
+        -576
+      ],
+      "id": "fa8ea4d3-5e7d-42b4-8eff-3847c5d62b7d",
+      "name": "is callback_query"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chat_id",
+              "lookupValue": "={{ $json.message?.chat?.id ?? $json.callback_query?.message?.chat?.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -208,
+        -160
+      ],
+      "id": "fd651d3c-5893-4327-b09f-b625e7dd0772",
+      "name": "Get Session",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message?.chat?.id ?? $('Telegram Trigger').item.json.callback_query?.message?.chat?.id }}",
+        "text": "👋 Вітаю! Це Contract Bot. Оберіть компанію для договору:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🚛 АвтоМув",
+                    "additionalFields": {
+                      "callback_data": "automov"
+                    }
+                  },
+                  {
+                    "text": "📋 ЮТС",
+                    "additionalFields": {
+                      "callback_data": "uts"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -240
+      ],
+      "id": "47dc0868-a0b7-4644-8aa2-236de60f3cd3",
+      "name": "Welcome Message",
+      "webhookId": "7014cd8d-5693-46bf-ab25-878277e67e7f",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.message?.chat?.id }}",
+            "step": "choose_company",
+            "data": "{}",
+            "updated_at": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        -240
+      ],
+      "id": "79d23fe1-c987-40a9-9b8c-61d14cb290c3",
+      "name": "Create Session",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "61cdbffc-f4de-4319-b022-e5b8decf9687",
+              "leftValue": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
+              "rightValue": "automov",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        240,
+        -544
+      ],
+      "id": "20fa48ff-77ab-48bd-8eb3-44ce86830c9b",
+      "name": "Which Company"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "🚛 АвтоМув обрано!  \nОберіть тип договору:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📄 Замовник (З)",
+                    "additionalFields": {
+                      "callback_data": "automov_z"
+                    }
+                  },
+                  {
+                    "text": "🚚 Перевізник (П)",
+                    "additionalFields": {
+                      "callback_data": "automov_p"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        -624
+      ],
+      "id": "60127e3f-bae1-47ee-926d-7e580deb60fb",
+      "name": "📨 Ask Role - AutoMov",
+      "webhookId": "4b6a50a7-e7aa-4494-b969-16db7d4007c1",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "📋 ЮТС обрано!\n\nОберіть тип договору:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📄 Замовник (З)",
+                    "additionalFields": {
+                      "callback_data": "uts_z"
+                    }
+                  },
+                  {
+                    "text": "🚚 Перевізник (П)",
+                    "additionalFields": {
+                      "callback_data": "uts_p"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        -432
+      ],
+      "id": "d940140e-a4fd-4893-a48f-647bd4b192b3",
+      "name": "📨 Ask Role - UTS",
+      "webhookId": "b09b6a4b-8d88-4a73-b622-3f832a50bcc8",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "company": "uts",
+            "chat_id": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+            "step": "choose_role",
+            "updated_at": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        -432
+      ],
+      "id": "6fa9de39-7a23-44ac-b135-79bb181306d2",
+      "name": "UTS",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "company": "automov",
+            "chat_id": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+            "step": "choose_role",
+            "updated_at": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        -624
+      ],
+      "id": "00f646f9-a1f6-4d31-8a49-3995afdd6d19",
+      "name": "💾 AutoMov",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b2e4045e-d130-49e4-87c3-14c3d9028017",
+              "leftValue": "={{ [\"automov_z\",\"automov_p\",\"uts_z\",\"uts_p\"].includes($('Telegram Trigger').item.json.callback_query?.data) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        16,
+        -768
+      ],
+      "id": "499ded19-f878-40b4-8648-eb90be17452d",
+      "name": "Is Role Selected"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+            "step": "=collect_data",
+            "role": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
+            "updated_at": "={{ new Date().toISOString() }}",
+            "company": "={{ $('Telegram Trigger').item.json.callback_query.data.includes('automov') ? 'automov' : 'uts' }}"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        -816
+      ],
+      "id": "04483c61-780c-440c-8b41-ab3d79b5d316",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.from.id }}",
+        "text": "✅ Чудово! Починаємо збір даних.\n\n📋 Крок 1 — Дані компанії:\n\nНадішліть у такому форматі:\nНазва компанії: \nДиректор (ПІБ): \nДіє на підставі: \nЮридична адреса:",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        -816
+      ],
+      "id": "7121cf7e-1541-4233-928d-96ce1020d67c",
+      "name": "Ask First Data",
+      "webhookId": "7f7e8059-a3bf-4f5f-8113-34b3a63cfca0",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c5e1535d-0ef6-4a86-8585-784c6165d958",
+              "leftValue": "={{ $json.step }}",
+              "rightValue": "choose_company",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        16,
+        -160
+      ],
+      "id": "6f6eb325-9f76-4b7a-81b7-256caf7d6062",
+      "name": "What is Step"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e8566b39-2e4f-4278-93f3-40e790282357",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message?.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        624
+      ],
+      "id": "a62a99f4-462a-4020-ab93-cac34bcf7c3f",
+      "name": "What is Message Type"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "data": "={{ $('Clean Company Response').item.json.companyData }}",
+            "step": "collect_route",
+            "updated_at": "={{ new Date().toISOString() }}",
+            "company": "={{ $('Get Session').item.json.company }}",
+            "role": "={{ $('Get Session').item.json.role }}"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3600,
+        720
+      ],
+      "id": "dd5b198a-cc25-4bc4-b039-5cdb58989772",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "✅ Дані компанії збережено!\n\n🚛 Крок 2 — Дані рейсу:\n\nНадішліть у такому форматі:\nМаршрут: (наприклад: Київ - Варшава)\nВантаж (назва, кількість, пакування):\nКількість місць і габарити (ДxШxВ):\nОсобливі умови перевезення:\nВантажовідправник:\nКонтакт відправника (тел):\nАдреса завантаження:\nДата завантаження:\nВантажоодержувач:\nКонтакт одержувача (тел):\nАдреса розвантаження:\nДата доставки:\nВимоги до авто:\nАвто (марка, модель, держ. номер):\nВодій (ПІБ, номер прав, тел):\nЦіна послуг:\nДодаткові умови:",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3824,
+        720
+      ],
+      "id": "450f5ccb-88db-446b-9e85-df9c502344cb",
+      "name": "Send a text message",
+      "webhookId": "e28c60a8-0495-438d-9d30-4114f523638a",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8638fe21-767a-4b94-901b-0c7dd69c98c9",
+              "leftValue": "={{ $('Get Session').item.json.step }}",
+              "rightValue": "collect_route",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2704,
+        512
+      ],
+      "id": "be2e68c6-99fa-4066-900e-a300a65cec66",
+      "name": "Is Route Step"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "step": "done",
+            "data": "={{ $('Clean OpenAI Response').item.json.merged }}",
+            "updated_at": "={{ new Date().toISOString() }}",
+            "company": "={{ $('Get Session').item.json.company }}",
+            "role": "={{ $('Get Session').item.json.role }}"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3376,
+        336
+      ],
+      "id": "d43c1f69-9c61-4f89-9dab-57c2383c59a0",
+      "name": "Update Route Data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "✅ Дані рейсу отримано! Генерую договір...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3600,
+        336
+      ],
+      "id": "e8a83483-1566-4e34-a964-28a7b1b33a77",
+      "name": "Route Data Received",
+      "webhookId": "afd38230-4bf2-4c54-aff4-add375af7e93",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Get Session').item.json.role === 'automov_z' ? '1gfenO1zSBdL9m_Wpf5iy0NBOCznrgTOw' : $('Get Session').item.json.role === 'automov_p' ? '1nlk5kNBTS5HvE-pEPEI1PohbtmvNBbY1' : $('Get Session').item.json.role === 'uts_z' ? '184GT2KmxCF0XODooqt70msiDh-t-xLD6' : '1MKR9DqCj86G3QJuf-y2vMUKKbWZmPxHu' }}",
+          "mode": "id"
+        },
+        "name": "=Договір_{{ $('Get Session').item.json.role }}_{{ $now.toFormat('yyyyMMdd_HHmm') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3824,
+        336
+      ],
+      "id": "9238745e-0e2e-439d-a165-fd96f4ec62a7",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy file').item.json.id }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"mimeType\": \"application/vnd.google-apps.document\",\n  \"name\": \"Договір_{{ $('Get Session').item.json.role }}_{{ $now.toFormat('yyyyMMdd_HHmm') }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4048,
+        336
+      ],
+      "id": "ea9a849d-78fd-4a59-9b68-16708d7b349c",
+      "name": "Convert to Google Doc",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Читаємо збережені дані компанії/перевізника з сесії\nlet sessionData = {};\ntry {\n  sessionData = JSON.parse($('Get Session').item.json.data || '{}');\n} catch(e) {}\n\n// Генеруємо SHORT поля замовника\nlet clientShort = sessionData.CLIENT_COMPANY || '';\nclientShort = clientShort.replace(\"ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ\", \"ТОВ\");\nclientShort = clientShort.replace(\"ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ\", \"ФОП\");\nclientShort = clientShort.replace(\"ПРИВАТНЕ ПІДПРИЄМСТВО\", \"ПП\");\nsessionData.CLIENT_COMPANY_SHORT = clientShort.trim();\nconst clientParts = (sessionData.CLIENT_DIRECTOR || '').trim().split(/\\s+/);\nsessionData.CLIENT_DIRECTOR_SHORT = clientParts.length >= 3\n  ? clientParts[0] + ' ' + clientParts[1][0] + '.' + clientParts[2][0] + '.'\n  : sessionData.CLIENT_DIRECTOR || '';\n\n// Генеруємо SHORT поля перевізника якщо є\nlet carrierShort = sessionData.CARRIER_COMPANY || '';\ncarrierShort = carrierShort.replace(\"ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ\", \"ТОВ\");\ncarrierShort = carrierShort.replace(\"ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ\", \"ФОП\");\ncarrierShort = carrierShort.replace(\"ПРИВАТНЕ ПІДПРИЄМСТВО\", \"ПП\");\nsessionData.CARRIER_COMPANY_SHORT = carrierShort.trim();\nconst carrierParts = (sessionData.CARRIER_DIRECTOR || '').trim().split(/\\s+/);\nsessionData.CARRIER_DIRECTOR_SHORT = carrierParts.length >= 3\n  ? carrierParts[0] + ' ' + carrierParts[1][0] + '.' + carrierParts[2][0] + '.'\n  : sessionData.CARRIER_DIRECTOR || '';\n\n// Читаємо дані рейсу\nconst routeContent = $('OpenAI Route Parser').item.json.choices[0].message.content;\nconst routeData = JSON.parse(routeContent);\n\n// Мержимо всі дані\nconst data = Object.assign({}, sessionData, routeData);\n\n// Службові поля\ndata.CONTRACT_DATE = $now.toFormat('dd.MM.yyyy');\ndata.CONTRACT_NUMBER = $now.toFormat('ddMMyy') + '-' + $now.toFormat('HHmm');\ndata.TRANSPORT_TYPE = 'Вантажоперевезення';\n\n// Будуємо запити на заміну плейсхолдерів\nconst requests = Object.entries(data).map(([key, value]) => ({\n  replaceAllText: {\n    containsText: { text: `{{${key}}}`, matchCase: true },\n    replaceText: String(value || '')\n  }\n}));\n\nreturn [{ json: { requests } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4272,
+        336
+      ],
+      "id": "a8dbfa11-da01-42fe-961e-b5c3e8fed5e7",
+      "name": "Build Replace Requests"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $('Convert to Google Doc').item.json.id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"requests\": {{ JSON.stringify($('Build Replace Requests').item.json.requests) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4496,
+        336
+      ],
+      "id": "4868f5fe-4f93-4d65-8717-cbf2bb9b9c3c",
+      "name": "Replace Placeholders",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "SemeNPDiRLM8FlBO",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Convert to Google Doc').item.json.id }}/export",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "mimeType",
+              "value": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4720,
+        336
+      ],
+      "id": "5e04383d-29e4-4bc2-bb59-b9cd0fa8eeac",
+      "name": "Export as DOCX",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "SemeNPDiRLM8FlBO",
+          "name": "Google Docs account"
+        },
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendDocument",
+        "chatId": "={{ $('Get Session').item.json.chat_id }}",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "✅ Договір готовий! Перевір та підпиши.",
+          "fileName": "=Договір_{{ $('Get Session').item.json.role }}_{{ $now.toFormat('yyyyMMdd') }}.docx"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4944,
+        336
+      ],
+      "id": "a9ec3c74-5983-4209-81f6-6021522770f0",
+      "name": "Send a document",
+      "webhookId": "cdfca52b-135c-4fee-bf77-69bc6c732d05",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy file').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        5392,
+        336
+      ],
+      "id": "2e647e11-8df2-4316-9bf4-e738373570e2",
+      "name": "Delete DOCX Copy",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Convert to Google Doc').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        5616,
+        336
+      ],
+      "id": "1079e998-a6f1-4477-b648-4bb63a89c11b",
+      "name": "Delete Google Doc",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $('OpenAI Company Parser').item.json.choices[0].message.content;\nconst start = content.indexOf('{');\nconst end = content.lastIndexOf('}');\nconst raw = content.substring(start, end + 1);\nconst clean = raw.replace(/\\n/g, '').replace(/\\r/g, '');\nconst data = JSON.parse(clean);\n\n// Генеруємо CLIENT_COMPANY_SHORT з CLIENT_COMPANY\n// ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ 'Назва' → ТОВ 'Назва'\n// ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ Іваненко І.І. → ФОП Іваненко І.І.\nlet short = data.CLIENT_COMPANY || '';\nshort = short.replace(\"ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ\", \"ТОВ\");\nshort = short.replace(\"ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ\", \"ФОП\");\nshort = short.replace(\"ПРИВАТНЕ ПІДПРИЄМСТВО\", \"ПП\");\ndata.CLIENT_COMPANY_SHORT = short.trim();\n\n// Генеруємо CLIENT_DIRECTOR_SHORT з CLIENT_DIRECTOR\n// Іваненко Іван Іванович → Іваненко І.І.\nconst director = data.CLIENT_DIRECTOR || '';\nconst parts = director.trim().split(/\\s+/);\nif (parts.length >= 3) {\n  data.CLIENT_DIRECTOR_SHORT = parts[0] + ' ' + parts[1][0] + '.' + parts[2][0] + '.';\n} else {\n  data.CLIENT_DIRECTOR_SHORT = director;\n}\n\nreturn [{ json: { companyData: JSON.stringify(data) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        720
+      ],
+      "id": "89083e85-987e-40dd-b62c-64753e92b41a",
+      "name": "Clean Company Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "95a1234b-91c8-43da-88ab-6af248358991",
+              "leftValue": "={{ $('Get Session').item.json.role }}",
+              "rightValue": "=_p",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2928,
+        608
+      ],
+      "id": "3add143b-b06e-486d-9496-8e501217562a",
+      "name": "Is Carrier"
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $('OpenAI Carrier Parser').item.json.choices[0].message.content;\nconst start = content.indexOf('{');\nconst end = content.lastIndexOf('}');\nconst raw = content.substring(start, end + 1);\nconst clean = raw.replace(/\\n/g, '').replace(/\\r/g, '');\nconst data = JSON.parse(clean);\n\nlet short = data.CARRIER_COMPANY || '';\nshort = short.replace(\"ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ\", \"ТОВ\");\nshort = short.replace(\"ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ\", \"ФОП\");\nshort = short.replace(\"ПРИВАТНЕ ПІДПРИЄМСТВО\", \"ПП\");\ndata.CARRIER_COMPANY_SHORT = short.trim();\n\nconst director = data.CARRIER_DIRECTOR || '';\nconst parts = director.trim().split(/\\s+/);\nif (parts.length >= 3) {\n  data.CARRIER_DIRECTOR_SHORT = parts[0] + ' ' + parts[1][0] + '.' + parts[2][0] + '.';\n} else {\n  data.CARRIER_DIRECTOR_SHORT = director;\n}\n\nreturn [{ json: { companyData: JSON.stringify(data) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        528
+      ],
+      "id": "4eda3dbd-ab2d-48bd-ac62-b005abbc385b",
+      "name": "Clean Carrier Response"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "data": "={{ $('Clean Carrier Response').item.json.companyData }}",
+            "step": "collect_route",
+            "updated_at": "={{ new Date().toISOString() }}",
+            "company": "={{ $('Get Session').item.json.company }}",
+            "role": "={{ $('Get Session').item.json.role }}"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3600,
+        528
+      ],
+      "id": "c0ba187c-2ab4-4890-bd17-2e11fbf2d2c3",
+      "name": "Update row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "✅ Дані компанії збережено!\n\n🚛 Крок 2 — Дані рейсу:\n\nНадішліть у такому форматі:\nМаршрут: (наприклад: Київ - Варшава)\nВантаж (назва, кількість, пакування):\nКількість місць і габарити (ДxШxВ):\nОсобливі умови перевезення:\nВантажовідправник:\nКонтакт відправника (тел):\nАдреса завантаження:\nДата завантаження:\nВантажоодержувач:\nКонтакт одержувача (тел):\nАдреса розвантаження:\nДата доставки:\nВимоги до авто:\nАвто (марка, модель, держ. номер):\nВодій (ПІБ, номер прав, тел):\nЦіна послуг:\nДодаткові умови:",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3824,
+        528
+      ],
+      "id": "ec6268ca-5878-4f14-aa30-6287b7ba2980",
+      "name": "Send a text message1",
+      "webhookId": "e28c60a8-0495-438d-9d30-4114f523638a",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Get Session').item.json.chat_id }}",
+            "step": "done",
+            "company": "={{ $('Get Session').item.json.company }}",
+            "role": "={{ $('Get Session').item.json.role }}",
+            "updated_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        5168,
+        336
+      ],
+      "id": "10df63b0-c364-46ef-8edf-2548d6e8d07d",
+      "name": "Set Step Done",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "44bc03c8-7abb-4f8b-9306-4bfe064cbae6",
+              "leftValue": "=={{ $('Get Session').item.json.step }}",
+              "rightValue": "done",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        240,
+        32
+      ],
+      "id": "db58c01f-0e3f-4e16-a459-0935abf3e2c3",
+      "name": "Is Step Done"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "updated_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        -16
+      ],
+      "id": "5170c266-f09c-4136-84f4-ce46bbebc7a6",
+      "name": "Reset Session",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message?.chat?.id ?? $('Telegram Trigger').item.json.callback_query?.message?.chat?.id }}",
+        "text": "👋 Вітаю! Це Contract Bot. Оберіть компанію для договору:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🚛 АвтоМув",
+                    "additionalFields": {
+                      "callback_data": "automov"
+                    }
+                  },
+                  {
+                    "text": "📋 ЮТС",
+                    "additionalFields": {
+                      "callback_data": "uts"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        -16
+      ],
+      "id": "263385cc-a47c-46ec-a980-be3081f5f73e",
+      "name": "Welcome After Reset",
+      "webhookId": "b61c8449-39a7-4265-aa86-d176db2cbb61",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e8fd4838-2643-4d2c-ab24-47a1428489bb",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -656,
+        -496
+      ],
+      "id": "d61d82ff-9aff-4afd-a2e2-8835aa4d05c9",
+      "name": "Is Start Command"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chat_id",
+              "lookupValue": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -208,
+        -768
+      ],
+      "id": "9cc76b3e-b087-4f9d-8cf2-14245729d840",
+      "name": "Get Session (callback)",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Hf9RqXujdeJjad90",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "567a379d-3c1a-4301-8be9-7882e8bae383",
+              "leftValue": "={{ [\"collect_data\",\"collect_carrier\",\"collect_route\"].includes($('Get Session (callback)').item.json.step) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        240,
+        -928
+      ],
+      "id": "595d5969-1daa-49d5-a650-3992bb20ddd7",
+      "name": "Is Session Active"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "⚠️ Ви вже заповнюєте договір.\nЩоб почати новий — натисніть /start",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        -1008
+      ],
+      "id": "9e9484a7-f7b6-488c-861f-65eb88c853fa",
+      "name": "Warning Active Session",
+      "webhookId": "b0879531-89fc-4065-a0e6-2fbadc6abe59",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2032,
+        288
+      ],
+      "id": "806b76db-8b01-40c1-94b1-fec8de9c5069",
+      "name": "Download Voice",
+      "webhookId": "4bbc6798-35f1-47f0-a1eb-0df527d8256d",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "56e9552a-8aac-41e5-a01a-cb109ee8aeee",
+              "leftValue": "={{ Boolean($('Telegram Trigger').item.json.message.voice) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        688,
+        672
+      ],
+      "id": "34e26f38-ac0c-42a8-9ab0-b3fc7a779d60",
+      "name": "Is Voice"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        2256,
+        288
+      ],
+      "id": "ee32166a-d315-490c-ad77-f4b0756467c4",
+      "name": "Whisper",
+      "credentials": {
+        "openAiApi": {
+          "id": "UVjrJaubMfGrWicq",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let userText = '';\nconst tgMessage = $('Telegram Trigger').first().json.message;\n\nif (tgMessage && tgMessage.text !== undefined) {\n  userText = tgMessage.text;\n} else if (tgMessage && tgMessage.voice !== undefined) {\n  userText = $('Whisper').first().json.text || '';\n} else if (tgMessage && tgMessage.document !== undefined &&\n           tgMessage.document.mime_type &&\n           tgMessage.document.mime_type.includes('word')) {\n  const binaryBuffer = await this.helpers.getBinaryDataBuffer(0, 'data');\n  userText = binaryBuffer.toString('utf-8');\n} else if (tgMessage && tgMessage.document !== undefined &&\n           tgMessage.document.mime_type &&\n           tgMessage.document.mime_type.includes('pdf')) {\n  let pdfData = $('Analyze PDF (OpenAI)').first().json;\n  if (Array.isArray(pdfData)) pdfData = pdfData[0];\n  if (pdfData?.output?.[0]?.content?.[0]?.text) {\n    userText = pdfData.output[0].content[0].text;\n  } else {\n    userText = '';\n  }\n} else {\n  let visionData = $('OpenAI Vision').first().json;\n  if (Array.isArray(visionData)) visionData = visionData[0];\n  if (visionData?.content?.[0]?.logprobs?.text) {\n    userText = visionData.content[0].logprobs.text;\n  } else if (visionData?.content?.[0]?.text) {\n    userText = visionData.content[0].text;\n  } else if (typeof visionData?.content === 'string') {\n    userText = visionData.content;\n  }\n}\nreturn [{json: {userText}}];;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        512
+      ],
+      "id": "fba3e664-7afa-4147-95a4-283cce8194b1",
+      "name": "Normalize Text"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b2fd939f-e2df-451d-90a3-ee224e8f3f5b",
+              "leftValue": "={{ Boolean($('Telegram Trigger').item.json.message.photo) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        912,
+        768
+      ],
+      "id": "fe2820ce-21a3-4b09-97eb-d603781d0d73",
+      "name": "Is Photo"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.photo.slice(-1)[0].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        432
+      ],
+      "id": "f704c2ec-b8e1-4dbb-9d0a-96a431978d7a",
+      "name": "Download Photo",
+      "webhookId": "4f13000b-5ac7-4fab-94d9-5619da7616fd",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "На зображенні документ з друкованим або рукописним текстом українською мовою. Розпізнай і випиши ВЕСЬ текст, який бачиш, зберігаючи порядок рядків зверху вниз так, як він розташований на сторінці — не міняй послідовність. Якщо текст структурований у вигляді пар \"назва поля: значення\" (як на бланках чи в таблицях) — зберігай ці пари разом, не розділяй назву від значення. Цифри переписуй символ в символ, точно як на зображенні, без округлень і виправлень. Виведи результат як звичайний текст, без власних коментарів чи висновків.",
+        "inputType": "base64",
+        "options": {
+          "maxTokens": 4096
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1808,
+        512
+      ],
+      "id": "08d97906-e3e9-4552-9c03-b08a6164511d",
+      "name": "OpenAI Vision",
+      "credentials": {
+        "openAiApi": {
+          "id": "UVjrJaubMfGrWicq",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5898bd70-ee87-4af1-ba8e-e99c6302fa87",
+              "leftValue": "={{ Boolean($('Telegram Trigger').item.json.message.document) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1136,
+        944
+      ],
+      "id": "c3c984fa-0487-4e88-a029-2276ed7ba81b",
+      "name": "Is Document"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.document.mime_type }}",
+                    "rightValue": "image/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "3e60d146-b05e-42f7-b88a-0ff879b25ae1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "864eb497-1da4-4f6b-8f4a-a75d7473997e",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.document.mime_type }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PDF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "92baec15-158f-4a26-ab68-85f64517563a",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.document.mime_type }}",
+                    "rightValue": "word",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Word"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        912
+      ],
+      "id": "67acbb57-5ff6-4c27-8cef-14b6405e8745",
+      "name": "Route by File Type"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        624
+      ],
+      "id": "baf5b573-6567-45f8-9391-0805bb079f98",
+      "name": "Download Document",
+      "webhookId": "92945dad-c25c-4a9a-a57a-7ad5a27d5ec2",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        1040
+      ],
+      "id": "f72b0568-fc98-4a03-be1f-7d1c3e624410",
+      "name": "Download Document (Word)",
+      "webhookId": "92945dad-c25c-4a9a-a57a-7ad5a27d5ec2",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Telegram Trigger').item.json.message.chat.id }}_{{ $('Telegram Trigger').item.json.message.document.file_name }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1OsCh5G6ZE1CManTaLBa2e84n4isGj7L2",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1808,
+        1040
+      ],
+      "id": "0a4adf66-36bb-4f7d-adbd-b651e44d49da",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Convert to Google Doc (Word)').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2256,
+        1040
+      ],
+      "id": "a4fdb73b-b3f1-4351-aa9b-ac1e425d9e63",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Upload file').item.json.id }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"mimeType\": \"application/vnd.google-apps.document\",\n  \"name\": \"{{ $('Upload file').item.json.name }}_converted\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2032,
+        1040
+      ],
+      "id": "e8b43b1d-ddbc-45f5-930f-1c078b8a6aff",
+      "name": "Convert to Google Doc (Word)",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Upload file').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2480,
+        1088
+      ],
+      "id": "ae8ed93e-5b41-4304-848b-2537541bccd5",
+      "name": "Delete Upload (Word)",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Convert to Google Doc (Word)').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2704,
+        1088
+      ],
+      "id": "43df3e29-ebd9-42d7-835f-77fbaa09f80c",
+      "name": "Delete Converted Doc (Word)",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IpMefrvLd7m3myEN",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1808,
+        800
+      ],
+      "id": "77fc0a6a-b00d-4cc7-927c-cff56cfdc52d",
+      "name": "Download Document (PDF)",
+      "webhookId": "92945dad-c25c-4a9a-a57a-7ad5a27d5ec2",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const binaryBuffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64String = binaryBuffer.toString('base64');\nconst fileName = $('Telegram Trigger').first().json.message.document.file_name || 'document.pdf';\n\nreturn [{json: {pdfBase64: base64String, fileName}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        800
+      ],
+      "id": "121e2907-c490-4a2b-9b5d-0737e54b95b0",
+      "name": "Convert PDF to Base64"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o\",\n  \"input\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"input_file\",\n          \"filename\": \"{{ $json.fileName }}\",\n          \"file_data\": \"data:application/pdf;base64,{{ $json.pdfBase64 }}\"\n        },\n        {\n          \"type\": \"input_text\",\n          \"text\": \"Це скан або PDF документа з реквізитами українського підприємства (виписка, картка підприємства, рахунок тощо). Уважно розпізнай і випиши ВЕСЬ текст з документа: назву компанії, ПІБ директора, юридичну адресу, код ЄДРПОУ, номер рахунку IBAN, назву банку, ІПН, телефон, email, контактну особу - все що бачиш. Цифри виписуй ОСОБЛИВО уважно, точно як у документі, без округлень і змін. Виведи результат як звичайний текст у вільній формі, без додаткових коментарів.\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2256,
+        800
+      ],
+      "id": "2fca3cbf-1dd7-4910-b4e6-5e0934a81a01",
+      "name": "Analyze PDF (OpenAI)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ubv32EhTHflSW0oa",
+          "name": "OpenAI Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Вибачте, цей тип файлу не підтримується 🙁 \nНадішліть, будь ласка: 📝 текстове повідомлення 🎤 голосове повідомлення 📷 фото документа 📄 PDF або Word (.docx) файл",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        1232
+      ],
+      "id": "64d10673-b4d4-4f22-9e23-06ec0997ee24",
+      "name": "Send Unsupported File Warning",
+      "webhookId": "febaec4a-fa0e-4f09-929b-dd1a928eee96",
+      "credentials": {
+        "telegramApi": {
+          "id": "6z5RQW1WWYmTj1Dq",
+          "name": "Contract"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4.1-mini\",\n  \"temperature\": 0,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Ти - експерт з українського корпоративного права та документообігу. Витягни реквізити ЗАМОВНИКА з тексту. CLIENT_COMPANY: повна офіційна назва, ТОВ розшифруй як ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ, ФОП як ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ, ПП як ПРИВАТНЕ ПІДПРИЄМСТВО, ніколи не міняй форму. CLIENT_DIRECTOR: завжди у форматі Прізвище Ім'я По-батькові; для ТОВ або ПП - директор або уповноважена особа якщо явно вказано; для ФОП - ім'я фізособи з CLIENT_COMPANY без слів ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ, у форматі Прізвище Ім'я По-батькові. CLIENT_BASIS: підстава БЕЗ слів 'діє на підставі'; якщо не вказано явно - для будь-якої форми пиши Статуту. CLIENT_ADDRESS: юридична адреса. CLIENT_EDRPOU: код ЄДРПОУ підприємства або фізособи; для ТОВ або ПП це 8 цифр; для ФОП це 10 цифр і збігається з ІПН; може бути підписано як ЄДРПОУ, ідентифікаційний код, ІПН/ЄДРПОУ. CLIENT_IBAN: цифри рахунку після UA без префіксу UA. CLIENT_BANK: назва банку. CLIENT_IPN: індивідуальний податковий номер 10 цифр; для ФОП збігається з CLIENT_EDRPOU - продублюй те саме значення; для ТОВ або ПП тільки якщо явно підписано як ІПН, інакше порожній рядок. CLIENT_PHONE: телефон. CLIENT_EMAIL: email. CLIENT_CONTACT: контактна особа замовника. Якщо поле не знайдено - порожній рядок.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ JSON.stringify($('Normalize Text').item.json.userText).slice(1,-1) }}\"\n    }\n  ],\n  \"response_format\": {\n    \"type\": \"json_schema\",\n    \"json_schema\": {\n      \"name\": \"company_data\",\n      \"strict\": true,\n      \"schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"CLIENT_COMPANY\": {\"type\": \"string\"},\n          \"CLIENT_DIRECTOR\": {\"type\": \"string\"},\n          \"CLIENT_BASIS\": {\"type\": \"string\"},\n          \"CLIENT_ADDRESS\": {\"type\": \"string\"},\n          \"CLIENT_EDRPOU\": {\"type\": \"string\"},\n          \"CLIENT_IBAN\": {\"type\": \"string\"},\n          \"CLIENT_BANK\": {\"type\": \"string\"},\n          \"CLIENT_IPN\": {\"type\": \"string\"},\n          \"CLIENT_PHONE\": {\"type\": \"string\"},\n          \"CLIENT_EMAIL\": {\"type\": \"string\"},\n          \"CLIENT_CONTACT\": {\"type\": \"string\"}\n        },\n        \"required\": [\"CLIENT_COMPANY\",\"CLIENT_DIRECTOR\",\"CLIENT_BASIS\",\"CLIENT_ADDRESS\",\"CLIENT_EDRPOU\",\"CLIENT_IBAN\",\"CLIENT_BANK\",\"CLIENT_IPN\",\"CLIENT_PHONE\",\"CLIENT_EMAIL\",\"CLIENT_CONTACT\"],\n        \"additionalProperties\": false\n      }\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3152,
+        720
+      ],
+      "id": "58844f9c-3d3b-422a-969b-3206312eccf3",
+      "name": "OpenAI Company Parser",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ubv32EhTHflSW0oa",
+          "name": "OpenAI Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4.1-mini\",\n  \"temperature\": 0,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Ти - експерт з українського корпоративного права та документообігу. Витягни реквізити ПЕРЕВІЗНИКА з тексту. CARRIER_COMPANY: повна офіційна назва, ТОВ розшифруй як ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ, ФОП як ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ, ПП як ПРИВАТНЕ ПІДПРИЄМСТВО, ніколи не міняй форму. CARRIER_DIRECTOR: завжди у форматі Прізвище Ім'я По-батькові; для ТОВ або ПП - директор або уповноважена особа якщо явно вказано; для ФОП - ім'я фізособи з CARRIER_COMPANY без слів ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ, у форматі Прізвище Ім'я По-батькові. CARRIER_BASIS: підстава БЕЗ слів 'діє на підставі'; якщо не вказано явно - для будь-якої форми пиши Статуту. CARRIER_ADDRESS: юридична адреса. CARRIER_EDRPOU: код ЄДРПОУ підприємства або фізособи; для ТОВ або ПП це 8 цифр; для ФОП це 10 цифр і збігається з ІПН; може бути підписано як ЄДРПОУ, ідентифікаційний код, ІПН/ЄДРПОУ. CARRIER_IBAN: цифри рахунку після UA без префіксу UA. CARRIER_BANK: назва банку. CARRIER_IPN: індивідуальний податковий номер 10 цифр; для ФОП збігається з CARRIER_EDRPOU - продублюй те саме значення; для ТОВ або ПП тільки якщо явно підписано як ІПН, інакше порожній рядок. CARRIER_PHONE: телефон. CARRIER_EMAIL: email. CARRIER_CONTACT: контактна особа перевізника. EXPEDITOR_CONTACT: контактна особа експедитора якщо явно вказана окремо, інакше порожній рядок. Якщо поле не знайдено - порожній рядок.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ JSON.stringify($('Normalize Text').item.json.userText).slice(1,-1) }}\"\n    }\n  ],\n  \"response_format\": {\n    \"type\": \"json_schema\",\n    \"json_schema\": {\n      \"name\": \"carrier_data\",\n      \"strict\": true,\n      \"schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"CARRIER_COMPANY\": {\"type\": \"string\"},\n          \"CARRIER_DIRECTOR\": {\"type\": \"string\"},\n          \"CARRIER_BASIS\": {\"type\": \"string\"},\n          \"CARRIER_ADDRESS\": {\"type\": \"string\"},\n          \"CARRIER_EDRPOU\": {\"type\": \"string\"},\n          \"CARRIER_IBAN\": {\"type\": \"string\"},\n          \"CARRIER_BANK\": {\"type\": \"string\"},\n          \"CARRIER_IPN\": {\"type\": \"string\"},\n          \"CARRIER_PHONE\": {\"type\": \"string\"},\n          \"CARRIER_EMAIL\": {\"type\": \"string\"},\n          \"CARRIER_CONTACT\": {\"type\": \"string\"},\n          \"EXPEDITOR_CONTACT\": {\"type\": \"string\"}\n        },\n        \"required\": [\"CARRIER_COMPANY\",\"CARRIER_DIRECTOR\",\"CARRIER_BASIS\",\"CARRIER_ADDRESS\",\"CARRIER_EDRPOU\",\"CARRIER_IBAN\",\"CARRIER_BANK\",\"CARRIER_IPN\",\"CARRIER_PHONE\",\"CARRIER_EMAIL\",\"CARRIER_CONTACT\",\"EXPEDITOR_CONTACT\"],\n        \"additionalProperties\": false\n      }\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3152,
+        528
+      ],
+      "id": "8966b9fb-00cd-45c6-9cd8-9350f81996af",
+      "name": "OpenAI Carrier Parser",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ubv32EhTHflSW0oa",
+          "name": "OpenAI Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4.1-mini\",\n  \"temperature\": 0,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Ти - експерт з логістики та міжнародних перевезень. Витягни дані про рейс з тексту. ROUTE: маршрут у форматі 'м. Київ - м. Львів', використовуй префікси м. с. смт. CARGO_INFO: найменування та кількість вантажу. CARGO_DIMENSIONS: кількість місць та габарити Д*Ш*В. CARGO_VALUE: вартість вантажу в грн тільки цифри. CARGO_REQUIREMENTS: вимоги до типу кузова (тент, реф, цистерна, тал, платформа тощо). SPECIAL_CONDITIONS: особливі умови перевезення (температурний режим, крихкий, не кантувати тощо). SENDER_INFO: повна назва вантажовідправника. SENDER_CONTACT: контактна особа та телефон відправника. LOADING_ADDRESS: точна адреса завантаження. LOADING_DATE: дата навантаження. CUSTOMS_LOADING: адреса замитнення якщо рейс міжнародний, інакше порожній рядок. BORDER_POINT: пункт перетину кордону якщо рейс міжнародний, інакше порожній рядок. CUSTOMS_UNLOADING: адреса розмитнення якщо рейс міжнародний, інакше порожній рядок. RECEIVER_INFO: повна назва вантажоодержувача. RECEIVER_CONTACT: контактна особа та телефон одержувача. UNLOADING_ADDRESS: точна адреса розвантаження. DELIVERY_DATE: дата доставки. VEHICLE_INFO: марка модель тип реєстраційний номер транспортного засобу та причепа. DRIVER_INFO: ПІБ водія номер посвідчення та телефон. SERVICE_PRICE: загальна ціна послуг тільки цифри. TRANSPORT_PRICE: плата за перевезення тільки цифри. EXTRA_CONDITIONS: додаткові умови якщо є. EXPEDITOR_CONTACT: контактна особа та телефон експедитора (менеджер який веде цей рейс з боку експедиції) якщо вказано, інакше порожній рядок. Якщо поле не знайдено - порожній рядок.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ JSON.stringify($('Normalize Text').item.json.userText).slice(1,-1) }}\"\n    }\n  ],\n  \"response_format\": {\n    \"type\": \"json_schema\",\n    \"json_schema\": {\n      \"name\": \"route_data\",\n      \"strict\": true,\n      \"schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"ROUTE\": {\"type\": \"string\"},\n          \"CARGO_INFO\": {\"type\": \"string\"},\n          \"CARGO_DIMENSIONS\": {\"type\": \"string\"},\n          \"CARGO_VALUE\": {\"type\": \"string\"},\n          \"CARGO_REQUIREMENTS\": {\"type\": \"string\"},\n          \"SPECIAL_CONDITIONS\": {\"type\": \"string\"},\n          \"SENDER_INFO\": {\"type\": \"string\"},\n          \"SENDER_CONTACT\": {\"type\": \"string\"},\n          \"LOADING_ADDRESS\": {\"type\": \"string\"},\n          \"LOADING_DATE\": {\"type\": \"string\"},\n          \"CUSTOMS_LOADING\": {\"type\": \"string\"},\n          \"BORDER_POINT\": {\"type\": \"string\"},\n          \"CUSTOMS_UNLOADING\": {\"type\": \"string\"},\n          \"RECEIVER_INFO\": {\"type\": \"string\"},\n          \"RECEIVER_CONTACT\": {\"type\": \"string\"},\n          \"UNLOADING_ADDRESS\": {\"type\": \"string\"},\n          \"DELIVERY_DATE\": {\"type\": \"string\"},\n          \"VEHICLE_INFO\": {\"type\": \"string\"},\n          \"DRIVER_INFO\": {\"type\": \"string\"},\n          \"SERVICE_PRICE\": {\"type\": \"string\"},\n          \"TRANSPORT_PRICE\": {\"type\": \"string\"},\n          \"EXTRA_CONDITIONS\": {\"type\": \"string\"},\n          \"EXPEDITOR_CONTACT\": {\"type\": \"string\"}\n        },\n        \"required\": [\"ROUTE\",\"CARGO_INFO\",\"CARGO_DIMENSIONS\",\"CARGO_VALUE\",\"CARGO_REQUIREMENTS\",\"SPECIAL_CONDITIONS\",\"SENDER_INFO\",\"SENDER_CONTACT\",\"LOADING_ADDRESS\",\"LOADING_DATE\",\"CUSTOMS_LOADING\",\"BORDER_POINT\",\"CUSTOMS_UNLOADING\",\"RECEIVER_INFO\",\"RECEIVER_CONTACT\",\"UNLOADING_ADDRESS\",\"DELIVERY_DATE\",\"VEHICLE_INFO\",\"DRIVER_INFO\",\"SERVICE_PRICE\",\"TRANSPORT_PRICE\",\"EXTRA_CONDITIONS\",\"EXPEDITOR_CONTACT\"],\n        \"additionalProperties\": false\n      }\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2928,
+        336
+      ],
+      "id": "e42ed295-6f8c-4158-86fe-965127912c12",
+      "name": "OpenAI Route Parser",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ubv32EhTHflSW0oa",
+          "name": "OpenAI Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $('OpenAI Route Parser').item.json.choices[0].message.content;\nconst start = content.indexOf('{');\nconst end = content.lastIndexOf('}');\nconst raw = content.substring(start, end + 1);\n\n// Прибираємо \\n та \\r — Groq часто їх вставляє незважаючи на промпт\nconst clean = raw.replace(/\\n/g, '').replace(/\\r/g, '');\n\nconst routeData = JSON.parse(clean);\n\nlet sessionData = {};\ntry {\n  sessionData = JSON.parse($('Get Session').item.json.data || '{}');\n} catch(e) {\n  sessionData = {};\n}\n\nconst merged = Object.assign(sessionData, routeData);\nreturn [{ json: { merged: JSON.stringify(merged) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3152,
+        336
+      ],
+      "id": "1121e581-8d84-4588-af16-bbe1eb222c65",
+      "name": "Clean OpenAI Response"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Is Start Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is callback_query": {
+      "main": [
+        [
+          {
+            "node": "Get Session (callback)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Session": {
+      "main": [
+        [
+          {
+            "node": "What is Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Welcome Message": {
+      "main": [
+        [
+          {
+            "node": "Create Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Which Company": {
+      "main": [
+        [
+          {
+            "node": "📨 Ask Role - AutoMov",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "📨 Ask Role - UTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📨 Ask Role - UTS": {
+      "main": [
+        [
+          {
+            "node": "UTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📨 Ask Role - AutoMov": {
+      "main": [
+        [
+          {
+            "node": "💾 AutoMov",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Role Selected": {
+      "main": [
+        [
+          {
+            "node": "Is Session Active",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Which Company",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Ask First Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "What is Step": {
+      "main": [
+        [
+          {
+            "node": "Welcome Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Step Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "What is Message Type": {
+      "main": [
+        [
+          {
+            "node": "Normalize Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Route Step": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Route Parser",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Carrier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Route Data": {
+      "main": [
+        [
+          {
+            "node": "Route Data Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Data Received": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Convert to Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Build Replace Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Replace Requests": {
+      "main": [
+        [
+          {
+            "node": "Replace Placeholders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Placeholders": {
+      "main": [
+        [
+          {
+            "node": "Export as DOCX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export as DOCX": {
+      "main": [
+        [
+          {
+            "node": "Send a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a document": {
+      "main": [
+        [
+          {
+            "node": "Set Step Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete DOCX Copy": {
+      "main": [
+        [
+          {
+            "node": "Delete Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Company Response": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Carrier": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Carrier Parser",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI Company Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Carrier Response": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Step Done": {
+      "main": [
+        [
+          {
+            "node": "Delete DOCX Copy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Step Done": {
+      "main": [
+        [
+          {
+            "node": "Reset Session",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "What is Message Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reset Session": {
+      "main": [
+        [
+          {
+            "node": "Welcome After Reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Start Command": {
+      "main": [
+        [
+          {
+            "node": "Reset Session",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "is callback_query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Session (callback)": {
+      "main": [
+        [
+          {
+            "node": "Is Role Selected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Session Active": {
+      "main": [
+        [
+          {
+            "node": "Warning Active Session",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Warning Active Session": {
+      "main": [
+        []
+      ]
+    },
+    "Is Voice": {
+      "main": [
+        [
+          {
+            "node": "Download Voice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Voice": {
+      "main": [
+        [
+          {
+            "node": "Whisper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Text": {
+      "main": [
+        [
+          {
+            "node": "Is Route Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Whisper": {
+      "main": [
+        [
+          {
+            "node": "Normalize Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Photo": {
+      "main": [
+        [
+          {
+            "node": "Download Photo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Photo": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Vision": {
+      "main": [
+        [
+          {
+            "node": "Normalize Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Document": {
+      "main": [
+        [
+          {
+            "node": "Route by File Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by File Type": {
+      "main": [
+        [
+          {
+            "node": "Download Document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Document (PDF)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Document (Word)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Unsupported File Warning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Document": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Document (Word)": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Convert to Google Doc (Word)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Google Doc (Word)": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Delete Upload (Word)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Normalize Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Upload (Word)": {
+      "main": [
+        [
+          {
+            "node": "Delete Converted Doc (Word)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Converted Doc (Word)": {
+      "main": [
+        []
+      ]
+    },
+    "Download Document (PDF)": {
+      "main": [
+        [
+          {
+            "node": "Convert PDF to Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert PDF to Base64": {
+      "main": [
+        [
+          {
+            "node": "Analyze PDF (OpenAI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze PDF (OpenAI)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Company Parser": {
+      "main": [
+        [
+          {
+            "node": "Clean Company Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Carrier Parser": {
+      "main": [
+        [
+          {
+            "node": "Clean Carrier Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Route Parser": {
+      "main": [
+        [
+          {
+            "node": "Clean OpenAI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean OpenAI Response": {
+      "main": [
+        [
+          {
+            "node": "Update Route Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Europe/Kyiv",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "HjFv7C0scUOguO8M"
+  },
+  "versionId": "917125f3-630d-4836-9862-75d0bfebd477",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "42f018bc95841081bfa413dfd545000a25d3357354d80ed4ab685a188851d948"
+  },
+  "id": "dyTwxu88ygdn0LAq",
+  "tags": [
+    {
+      "updatedAt": "2026-05-10T15:46:04.318Z",
+      "createdAt": "2026-05-10T15:46:04.318Z",
+      "id": "QNLcZyQOGymcZ8IV",
+      "name": "work"
+    }
+  ]
+}
