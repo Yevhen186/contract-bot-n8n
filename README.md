@@ -95,11 +95,17 @@ Two workflows:
 
 ## 📸 Demo
 
-### Bot conversation flow
-![Bot demo](docs/screenshots/bot_demo.png)
+### Bot conversation flow — start
+![Bot demo 1](docs/screenshots/bot_demo_1.png)
+
+### Bot conversation flow — result
+![Bot demo 2](docs/screenshots/bot_demo_2.png)
 
 ### Workflow overview
 ![Workflow](docs/screenshots/workflow_overview.png)
+
+### Error Handler
+![Error Handler](docs/screenshots/error_handler.png)
 
 ---
 
