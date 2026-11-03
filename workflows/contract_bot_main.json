@@ -1720,7 +1720,7 @@
           "conditions": [
             {
               "id": "44bc03c8-7abb-4f8b-9306-4bfe064cbae6",
-              "leftValue": "=={{ $('Get Session').item.json.step }}",
+              "leftValue": "={{ $('Get Session').item.json.step }}",
               "rightValue": "done",
               "operator": {
                 "type": "string",
