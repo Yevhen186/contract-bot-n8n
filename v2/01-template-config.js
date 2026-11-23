@@ -44,13 +44,13 @@ const INTL_REQ = ['CUSTOMS_LOADING', 'BORDER_POINT', 'CUSTOMS_UNLOADING'];
 // templateId — з v1 (вузол Copy file)
 const TEMPLATES = {
   automov_z: { co: 'automov', side: 'z', templateId: '1gfenO1zSBdL9m_Wpf5iy0NBOCznrgTOw', title: 'Договір із замовником (АвтоМув)',
-    required: [...CLIENT_REQ, ...ROUTE_REQ, 'SERVICE_PRICE', 'CLIENT_TERMS'] },
+    required: [...CLIENT_REQ, ...ROUTE_REQ, 'SERVICE_PRICE'] },
   automov_p: { co: 'automov', side: 'p', templateId: '1nlk5kNBTS5HvE-pEPEI1PohbtmvNBbY1', title: 'Заявка перевізнику (АвтоМув)',
-    required: [...CARRIER_REQ, ...ROUTE_REQ, 'VEHICLE_INFO', 'DRIVER_INFO', 'TRANSPORT_PRICE', 'CARRIER_TERMS'] },
+    required: [...CARRIER_REQ, ...ROUTE_REQ, 'VEHICLE_INFO', 'DRIVER_INFO', 'TRANSPORT_PRICE'] },
   uts_z: { co: 'uts', side: 'z', templateId: '184GT2KmxCF0XODooqt70msiDh-t-xLD6', title: 'Договір із замовником (ЮТС)',
-    required: [...CLIENT_REQ, ...ROUTE_REQ, 'SERVICE_PRICE', 'CLIENT_TERMS'] },
+    required: [...CLIENT_REQ, ...ROUTE_REQ, 'SERVICE_PRICE'] },
   uts_p: { co: 'uts', side: 'p', templateId: '1MKR9DqCj86G3QJuf-y2vMUKKbWZmPxHu', title: 'Заявка перевізнику (ЮТС)',
-    required: [...CARRIER_REQ, ...ROUTE_REQ, 'VEHICLE_INFO', 'DRIVER_INFO', 'TRANSPORT_PRICE', 'CARRIER_TERMS'] },
+    required: [...CARRIER_REQ, ...ROUTE_REQ, 'VEHICLE_INFO', 'DRIVER_INFO', 'TRANSPORT_PRICE'] },
 };
 // роль із сесії → які шаблони генерувати
 const ROLE_DOCS = {

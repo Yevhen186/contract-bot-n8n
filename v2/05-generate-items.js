@@ -8,6 +8,21 @@ let data = {};
 try { data = JSON.parse(session.data || '{}'); } catch (e) { data = {}; }
 
 const ids = cfg.ROLE_DOCS[session.role] || [];
+// Номер не вигадуємо: якщо його не назвали — у договорі помітна позначка, менеджер впише вручну.
+const NO_NUMBER = '[ВПИШІТЬ № УГОДИ]';
+const noNumber = !data.CONTRACT_NUMBER;
+if (noNumber) data.CONTRACT_NUMBER = NO_NUMBER;
+
+// Ціни в документі — повністю: «15 000 грн, без ПДВ, безготівковий розрахунок».
+// У сесії лишаються числа (для перевірки маржі); ПДВ замовнику — за нашою компанією, перевізнику — за його податковим статусом.
+const co = cfg.OUR[(session.role || '').startsWith('uts') ? 'uts' : 'automov'];
+const money = v => String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+// «без реєстрації ПДВ», «не є платником ПДВ», «неплатник» → без ПДВ
+const carrierVat = /ПДВ/i.test(data.CARRIER_TAX || '') && !/без\s+(реєстрації\s+)?ПДВ|неплатник|не\s+є\s+платник/i.test(data.CARRIER_TAX || '');
+const priceText = (v, vat) => (/^\d+(\.\d+)?$/.test(String(v || '')) ? `${money(v)} грн, ${vat ? 'з ПДВ' : 'без ПДВ'}, безготівковий розрахунок` : String(v || ''));
+data.SERVICE_PRICE = priceText(data.SERVICE_PRICE, co.vat);
+data.TRANSPORT_PRICE = priceText(data.TRANSPORT_PRICE, carrierVat);
+
 return ids.map(id => {
   const t = cfg.TEMPLATES[id];
   const requests = Object.entries(data).map(([key, value]) => ({
@@ -17,7 +32,8 @@ return ids.map(id => {
   return { json: {
     chat_id: String(session.chat_id),
     templateId: t.templateId,
-    fileName: `${t.side === 'z' ? 'Договір' : 'Заявка'} ${data.CONTRACT_NUMBER || ''} ${route}`.replace(/\s+/g, ' ').trim(),
+    fileName: `${t.side === 'z' ? 'Договір' : 'Заявка'} ${noNumber ? 'БЕЗ НОМЕРА' : data.CONTRACT_NUMBER} ${route}`.replace(/\s+/g, ' ').trim(),
     requests,
+    noNumber,
   } };
 });

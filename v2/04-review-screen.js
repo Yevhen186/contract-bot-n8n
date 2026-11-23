@@ -21,7 +21,10 @@ const found = [...req].filter(k => d[k]).length;
 
 const L = [];
 L.push(`📋 ${cfg.OUR[coKey].short} → ${docsTxt}`);
-L.push(`№ угоди: ${d.CONTRACT_NUMBER || '— (скажіть «угода 62811450»)'}  ·  знайдено ${found} з ${req.size}`);
+L.push(d.CONTRACT_NUMBER
+  ? `№ угоди: ${d.CONTRACT_NUMBER}  ·  знайдено ${found} з ${req.size}`
+  : `⚠️⚠️ № УГОДИ НЕ ВКАЗАНО — напишіть «угода 62811450»
+Знайдено ${found} з ${req.size}`);
 
 const sides = r.docs.map(x => x.side);
 if (sides.includes('z')) {

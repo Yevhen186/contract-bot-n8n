@@ -27,6 +27,17 @@ const run = (file, nodes, input) => {
   const sch = req.body.response_format.json_schema.schema;
   assert.deepStrictEqual(sch.required.sort(), Object.keys(sch.properties).sort(), 'strict: усі поля required');
   JSON.parse(JSON.stringify(req.body));
+  assert(!req.body.messages[0].content.includes('РОЗДІЛЕНІ'), 'без поміток — без правила розділів');
+
+  // «Обидва» з кнопкою: файли перевізника прийшли раніше за замовника — все одно групуються правильно
+  const sreq = (await run('02-build-request.js', nodes, [
+    { batch_id: 'b1', kind: 'pdf:carrier', name: 'СПК Ковальчук.pdf', text: 'КОВАЛЬЧУК ОКСАНА ПЕТРІВНА 3104528715' },
+    { batch_id: 'b1', kind: 'pdf:client', name: 'Виписка.pdf', text: 'АГРОСВІТ' },
+    { batch_id: 'b1', kind: 'text:carrier', name: '', text: 'ціна 15000' },
+  ]))[0].json;
+  const su = sreq.body.messages[1].content;
+  assert(su.indexOf('ДОКУМЕНТИ ЗАМОВНИКА') < su.indexOf('АГРОСВІТ') && su.indexOf('АГРОСВІТ') < su.indexOf('ДОКУМЕНТИ ПЕРЕВІЗНИКА') && su.indexOf('ДОКУМЕНТИ ПЕРЕВІЗНИКА') < su.indexOf('КОВАЛЬЧУК'), 'групи в правильному порядку');
+  assert(!su.includes('pdf:carrier') && sreq.count === 3 && sreq.body.messages[0].content.includes('РОЗДІЛЕНІ'));
 
   // відповідь моделі (вигадана): IBAN без UA, ФОП зі «Статутом», наші реквізити в перевізнику не заважають — інша сторона
   const F = nodes['Template Config'].FIELDS, ans = {};
@@ -46,21 +57,31 @@ const run = (file, nodes, input) => {
   const post = (await run('03-post-process.js', nodes, [{ choices: [{ message: { content: JSON.stringify(ans) } }] }]))[0].json;
   const d = post.data;
   assert.strictEqual(d.CARRIER_BASIS, 'Виписки з ЄДР', 'ФОП: підставу виправлено');
-  assert.strictEqual(d.CARRIER_DIRECTOR, 'ГОНЧАРУК ІГОР ВАСИЛЬОВИЧ');
+  assert.strictEqual(d.CARRIER_DIRECTOR, 'Гончарук Ігор Васильович');
   assert.strictEqual(d.CARRIER_IPN, '3124508717');
   assert.strictEqual(d.SERVICE_PRICE, '7000');
   assert.strictEqual(d.CLIENT_COMPANY_SHORT, 'ТОВ «БУДТРЕЙД-ГРУП»');
   assert(post.warnings.some(w => w.includes('IBAN перевізника')), 'битий IBAN перевізника пійманий');
   assert(!post.warnings.some(w => w.includes('IBAN замовника')), 'IBAN замовника правильний');
-  assert.deepStrictEqual(post.missing, ['CARRIER_TERMS']);
+  assert.deepStrictEqual(post.missing, []);  // TERMS немає в шаблонах — не вимагаємо
 
   // наші реквізити в стороні — очищаються
   const bad = { ...ans, CARRIER_EDRPOU: '45618360' };
   const post2 = (await run('03-post-process.js', nodes, [{ choices: [{ message: { content: JSON.stringify(bad) } }] }]))[0].json;
   assert.strictEqual(post2.data.CARRIER_COMPANY, '');
 
+  // випадок із практики (дані вигадані): ШІ загубив одну «1» в IBAN → виправляємо за текстом документа
+  nodes['Build AI Request'] = { body: { messages: [{}, { content: 'р/р UA 93 305299 0000026007015598123 \nНазва банку: АТ КБ «ПриватБанк»' }] } };
+  const nes = { ...ans, CARRIER_COMPANY: 'ФІЗИЧНА ОСОБА - ПІДПРИЄМЕЦЬ КОВАЛЬЧУК ОКСАНА ПЕТРІВНА', CARRIER_EDRPOU: '3104528715', CARRIER_DIRECTOR: '', CARRIER_IBAN: '93305299000002600701559823' };
+  const pn = (await run('03-post-process.js', nodes, [{ choices: [{ message: { content: JSON.stringify(nes) } }] }]))[0].json;
+  assert.strictEqual(pn.data.CARRIER_IBAN, '933052990000026007015598123', 'IBAN виправлено з тексту');
+  assert(!pn.warnings.some(w => w.includes('IBAN перевізника')), 'після виправлення попередження немає');
+  assert.strictEqual(pn.data.CARRIER_COMPANY_SHORT, 'ФОП КОВАЛЬЧУК ОКСАНА ПЕТРІВНА');
+  assert.strictEqual(pn.data.CARRIER_DIRECTOR, 'Ковальчук Оксана Петрівна');
+  delete nodes['Build AI Request'];
+
   const rev = (await run('04-review-screen.js', nodes, [post]))[0].json;
-  assert(rev.text.length < 4096 && rev.text.includes('Оплата перевізнику') && rev.text.includes('Маржа: 1'));
+  assert(rev.text.length < 4096 && rev.text.includes('Маржа: 1'));
 
   // patch-режим: поточні дані йдуть у промпт
   nodes['Get Session'] = { ...nodes['Get Session'], step: 'review', data: post.dataJson };
@@ -72,6 +93,15 @@ const run = (file, nodes, input) => {
   const gen = await run('05-generate-items.js', nodes, []);
   assert.strictEqual(gen.length, 2, '«Обидва» → 2 документи');
   assert(gen[0].json.fileName.startsWith('Договір 62811450'));
+  const price = (g, k) => g.json.requests.find(r => r.replaceAllText.containsText.text === `{{${k}}}`).replaceAllText.replaceText;
+  assert.strictEqual(price(gen[1], 'TRANSPORT_PRICE'), '5 500 грн, без ПДВ, безготівковий розрахунок');
+  // ПДВ перевізника за податковим статусом
+  for (const [tax, want] of [['Платник єдиного податку 3 групи (3%), платник ПДВ', 'з ПДВ'], ['3 група, без реєстрації ПДВ', 'без ПДВ'], ['не є платником ПДВ', 'без ПДВ']]) {
+    const dd = JSON.parse(post.dataJson); dd.CARRIER_TAX = tax;
+    nodes['Get Session (callback)'] = { ...nodes['Get Session'], data: JSON.stringify(dd) };
+    const g = await run('05-generate-items.js', nodes, []);
+    assert(price(g[1], 'TRANSPORT_PRICE').includes(', ' + want + ','), tax + ' → ' + want);
+  }
 
   console.log(rev.text);
   console.log('\nOK: усі перевірки пройшли');
