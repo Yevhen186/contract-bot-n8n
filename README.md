@@ -1,5 +1,7 @@
 # 📄 Contract Bot — AI contract generation for a logistics company
 
+🇬🇧 English | [🇺🇦 Українська](README.uk.md)
+
 > Built for and used in a real Ukrainian freight-forwarding company (2025–2026).
 > n8n · OpenAI · Google Drive/Docs/Sheets · Telegram
 
