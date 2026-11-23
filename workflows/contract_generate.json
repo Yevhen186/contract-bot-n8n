@@ -1,0 +1,301 @@
+{
+  "name": "Contract Generate",
+  "nodes": [
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "a535302a-d086-44a7-b22a-3b86543bd1ec"
+    },
+    {
+      "name": "Copy file",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        220,
+        0
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7tK2zBZfJopHGKcH",
+          "name": "Google Drive account 2"
+        }
+      },
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.templateId }}",
+          "mode": "id"
+        },
+        "name": "={{ $json.fileName }}",
+        "options": {}
+      },
+      "id": "8c4d5445-94dc-4b00-8f6f-7699700c1bf4"
+    },
+    {
+      "name": "Convert to Google Doc",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7tK2zBZfJopHGKcH",
+          "name": "Google Drive account 2"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy file').item.json.id }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ mimeType: 'application/vnd.google-apps.document', name: $('When Executed by Another Workflow').item.json.fileName }) }}",
+        "options": {}
+      },
+      "id": "b9be7778-a620-4062-b542-e0c0197cac4e"
+    },
+    {
+      "name": "Replace Placeholders",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        660,
+        0
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "wTSs6x8mbO10MKvo",
+          "name": "Google Docs account"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $('Convert to Google Doc').item.json.id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ requests: $('When Executed by Another Workflow').item.json.requests }) }}",
+        "options": {}
+      },
+      "id": "94b0a72a-1bbf-4f2e-b193-041568866386"
+    },
+    {
+      "name": "Export as DOCX",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        880,
+        0
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7tK2zBZfJopHGKcH",
+          "name": "Google Drive account 2"
+        }
+      },
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Convert to Google Doc').item.json.id }}/export",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "mimeType",
+              "value": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "a52af17b-c16f-43b9-bd81-2ae38770421b"
+    },
+    {
+      "name": "Send a document",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        0
+      ],
+      "webhookId": "e2126102-037a-4463-9e4f-926edcf82b5b",
+      "credentials": {
+        "telegramApi": {
+          "id": "pqP6Cx5iK8U94yL5",
+          "name": "Contract Test"
+        }
+      },
+      "parameters": {
+        "operation": "sendDocument",
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.chat_id }}",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "={{ '📄 ' + $('When Executed by Another Workflow').item.json.fileName }}",
+          "fileName": "={{ $('When Executed by Another Workflow').item.json.fileName + '.docx' }}"
+        }
+      },
+      "id": "f428f2b8-33e3-4ce4-ab33-de2376609f59"
+    },
+    {
+      "name": "Delete DOCX Copy",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1320,
+        0
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7tK2zBZfJopHGKcH",
+          "name": "Google Drive account 2"
+        }
+      },
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy file').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "3fbc58e1-f46b-4251-b23c-6756aa56234c"
+    },
+    {
+      "name": "Delete Google Doc",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1540,
+        0
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7tK2zBZfJopHGKcH",
+          "name": "Google Drive account 2"
+        }
+      },
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Convert to Google Doc').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "4c963a79-a3e3-419d-a223-736209dcd28f"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Convert to Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Replace Placeholders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Placeholders": {
+      "main": [
+        [
+          {
+            "node": "Export as DOCX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export as DOCX": {
+      "main": [
+        [
+          {
+            "node": "Send a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a document": {
+      "main": [
+        [
+          {
+            "node": "Delete DOCX Copy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete DOCX Copy": {
+      "main": [
+        [
+          {
+            "node": "Delete Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

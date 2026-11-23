@@ -6,10 +6,10 @@
       "type": "n8n-nodes-base.errorTrigger",
       "typeVersion": 1,
       "position": [
-        0,
+        -512,
         0
       ],
-      "id": "c9d1ae62-fb73-4866-9ace-927c73b6fe90",
+      "id": "2df203ae-936b-4d75-93fb-28934b45c32b",
       "name": "Error Trigger"
     },
     {
@@ -23,40 +23,39 @@
         },
         "sheetName": {
           "__rl": true,
-          "value": "gid=0",
-          "mode": "list",
-          "cachedResultName": "Sessions",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGy8MVhbyuzcYZphzsqOukW7Y0OtVIEKqBE3d3ali8U/edit#gid=0"
+          "value": "Sessions_v2",
+          "mode": "name"
         },
         "options": {}
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        208,
+        -304,
         0
       ],
-      "id": "e3fd6a48-86e9-41ed-8770-a7b499facd4b",
+      "id": "3d9a46ea-5c1e-457f-937c-332615fc4a63",
       "name": "Get Latest Session",
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "Hf9RqXujdeJjad90",
+          "id": "xBCPRBZqnXGQGHi3",
           "name": "Google Sheets account 2"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
-        "jsCode": "const rows = $input.all();\n\n// Знаходимо рядок з найсвіжішим updated_at\nlet latest = null;\nfor (const row of rows) {\n  const t = row.json.updated_at;\n  if (!t) continue;\n  if (!latest || t > latest.json.updated_at) {\n    latest = row;\n  }\n}\n\nconst chat_id = latest?.json?.chat_id ? String(latest.json.chat_id).replace(/\\s/g, '') : null;\nconst error_message = $('Error Trigger').first().json.execution?.error?.message || 'Невідома помилка';\nconst error_node = $('Error Trigger').first().json.execution?.error?.node?.name || $('Error Trigger').first().json.execution?.lastNodeExecuted || 'Невідомий вузол';\n\nreturn [{\n  json: {\n    chat_id,\n    error_message,\n    error_node\n  }\n}];"
+        "jsCode": "const t = $('Error Trigger').first().json;\nconst rows = $input.all().map(r => r.json).filter(r => r.chat_id && r.updated_at);\n// чат менеджера, який діяв останнім (за updated_at у Sessions_v2) — і лише якщо це було в останні 15 хв\nlet latest = null;\nfor (const r of rows) if (!latest || String(r.updated_at) > String(latest.updated_at)) latest = r;\nconst fresh = latest && (Date.now() - new Date(latest.updated_at).getTime()) < 15 * 60e3;\nconst chat_id = latest && fresh ? String(latest.chat_id).replace(/s/g, '') : '';\nconst ex = t.execution || {};\nreturn [{ json: {\n  chat_id,\n  error_message: String(ex.error?.message || 'Невідома помилка').slice(0, 500),\n  error_node: ex.error?.node?.name || ex.lastNodeExecuted || 'Невідомий вузол',\n  workflow: t.workflow?.name || '',\n  url: ex.url || '',\n} }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        416,
+        -96,
         0
       ],
-      "id": "154d7922-51a8-4ea2-a857-9d27e225a7c4",
+      "id": "efe6a75e-7e14-4c1b-8589-3ef79a81db88",
       "name": "Extract chat_id"
     },
     {
@@ -88,16 +87,16 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        624,
+        112,
         0
       ],
-      "id": "3d5a7d73-4cd1-46d5-8827-9ea434ff1e48",
+      "id": "6137610f-ede5-42b1-94a5-268139b34ab8",
       "name": "Has chat_id"
     },
     {
       "parameters": {
-        "chatId": "457989552",
-        "text": "Вибачте, сталась технічна помилка. Будь ласка, почніть спочатку — /start",
+        "chatId": "={{ $json.chat_id }}",
+        "text": "Вибачте, сталася технічна помилка — документи не створено. Адміністратора вже повідомлено. Почніть спочатку: /start",
         "additionalFields": {
           "appendAttribution": false
         }
@@ -105,23 +104,24 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        832,
+        320,
         -96
       ],
-      "id": "e3d226cb-b9ab-4c5c-b960-598f7b81977d",
+      "id": "9c8d0fd2-cc20-4670-a83b-e95ed1569230",
       "name": "Notify User",
       "webhookId": "d874ee46-4984-429a-affd-bfe734fcf907",
       "credentials": {
         "telegramApi": {
-          "id": "6z5RQW1WWYmTj1Dq",
-          "name": "Contract"
+          "id": "pqP6Cx5iK8U94yL5",
+          "name": "Contract Test"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
-        "chatId": "457989552 ",
-        "text": "={{ 'Error: ' + $('Extract chat_id').first().json.error_node + ' | ' + $('Extract chat_id').first().json.error_message + ' | user: ' + $('Extract chat_id').first().json.chat_id }}",
+        "chatId": "457989552",
+        "text": "={{ '⚠️ ' + $('Extract chat_id').first().json.workflow + '\nВузол: ' + $('Extract chat_id').first().json.error_node + '\nПомилка: ' + $('Extract chat_id').first().json.error_message + '\nКористувач: ' + ($('Extract chat_id').first().json.chat_id || 'невідомо') + '\n' + $('Extract chat_id').first().json.url }}",
         "additionalFields": {
           "appendAttribution": false
         }
@@ -129,23 +129,24 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        832,
+        320,
         96
       ],
-      "id": "9f37dc8e-3259-4c51-8c9d-568ddf04fe29",
+      "id": "e6b49443-fed0-45e0-b948-998b2da6cd8d",
       "name": "Notify Admin Only",
       "webhookId": "516bfca0-7e5a-4cb9-83de-c9aed5492e19",
       "credentials": {
         "telegramApi": {
-          "id": "6z5RQW1WWYmTj1Dq",
-          "name": "Contract"
+          "id": "pqP6Cx5iK8U94yL5",
+          "name": "Contract Test"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
-        "chatId": "457989552 ",
-        "text": "={{ 'Error: ' + $('Extract chat_id').first().json.error_node + ' | ' + $('Extract chat_id').first().json.error_message + ' | user: ' + $('Extract chat_id').first().json.chat_id }}",
+        "chatId": "457989552",
+        "text": "={{ '⚠️ ' + $('Extract chat_id').first().json.workflow + '\nВузол: ' + $('Extract chat_id').first().json.error_node + '\nПомилка: ' + $('Extract chat_id').first().json.error_message + '\nКористувач: ' + ($('Extract chat_id').first().json.chat_id || 'невідомо') + '\n' + $('Extract chat_id').first().json.url }}",
         "additionalFields": {
           "appendAttribution": false
         }
@@ -153,21 +154,21 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1024,
+        512,
         -96
       ],
-      "id": "aed22373-96ce-4e5f-b9da-04ffdcb2d892",
+      "id": "02c1c0a2-4dc5-4126-92d6-f7b86ed22017",
       "name": "Notify Admin",
       "webhookId": "516bfca0-7e5a-4cb9-83de-c9aed5492e19",
       "credentials": {
         "telegramApi": {
-          "id": "6z5RQW1WWYmTj1Dq",
-          "name": "Contract"
+          "id": "pqP6Cx5iK8U94yL5",
+          "name": "Contract Test"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     }
   ],
-  "pinData": {},
   "connections": {
     "Error Trigger": {
       "main": [
@@ -232,23 +233,8 @@
       ]
     }
   },
-  "active": true,
   "settings": {
-    "executionOrder": "v1",
-    "binaryMode": "separate"
+    "executionOrder": "v1"
   },
-  "versionId": "83b0026b-4e52-4c6c-884a-eaa36c4413ed",
-  "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "42f018bc95841081bfa413dfd545000a25d3357354d80ed4ab685a188851d948"
-  },
-  "id": "HjFv7C0scUOguO8M",
-  "tags": [
-    {
-      "updatedAt": "2026-05-10T15:46:04.318Z",
-      "createdAt": "2026-05-10T15:46:04.318Z",
-      "id": "QNLcZyQOGymcZ8IV",
-      "name": "work"
-    }
-  ]
+  "pinData": {}
 }
